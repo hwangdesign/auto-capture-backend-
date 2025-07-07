@@ -47,3 +47,9 @@ jobs:
             echo "❌ Screenshot not found."
             exit 1
           fi
+
+      - name: Upload screenshot as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: captured-screenshot
+          path: screenshots/*.png

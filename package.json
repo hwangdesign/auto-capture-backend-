@@ -1,2 +1,13 @@
-npm init -y
-npm install puppeteer express uuid
+{
+  "name": "auto-capture-backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^22.0.0",
+    "uuid": "^9.0.0"
+  }
+}

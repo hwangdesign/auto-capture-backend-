@@ -28,6 +28,7 @@ async function captureMobileScreenshot(url) {
     await browser.close();
     return fileName;
   } catch (error) {
+    console.error('❌ Error during capture:', error);
     await browser.close();
     throw new Error(`Capture failed: ${error.message}`);
   }

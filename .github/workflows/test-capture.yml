@@ -1,0 +1,45 @@
+name: Test AutoCapture Backend
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # 수동 실행도 가능
+
+jobs:
+  test-capture:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Puppeteer Chromium
+        run: |
+          node -e "require('puppeteer').executablePath()" || true
+
+      - name: Run server in background
+        run: |
+          node server.js &
+          sleep 5
+
+      - name: Test capture API
+        run: |
+          curl "http://localhost:3000/capture?url=https://www.example.com" -o test_result.json || echo "API call failed"
+          cat test_result.json
+
+      - name: Verify image created
+        run: |
+          if [ -f screenshots/*.png ]; then
+            echo "✅ Screenshot captured successfully."
+          else
+            echo "❌ Screenshot not found."
+            exit 1
+          fi

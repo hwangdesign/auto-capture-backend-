@@ -4,31 +4,45 @@ const fs = require('fs');
 const path = require('path');
 
 async function captureMobileScreenshot(url) {
+  console.log('🌐 URL to capture:', url);
+
+  const screenshotsDir = path.resolve(__dirname, 'screenshots');
+  if (!fs.existsSync(screenshotsDir)) {
+    fs.mkdirSync(screenshotsDir);
+    console.log('📁 Created screenshots directory');
+  }
+
   const browser = await puppeteer.launch({
     headless: 'new',
+    args: ['--no-sandbox'], // GitHub Actions 환경에서 필수
     defaultViewport: {
-      width: 390,  // iPhone 14 Pro 기준
+      width: 390,
       height: 844,
       isMobile: true
     }
   });
 
   const page = await browser.newPage();
+
   await page.setUserAgent(
     'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) ' +
     'AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
   );
 
   try {
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 20000 });
+    console.log('🕒 Navigating to page...');
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+
     const fileName = `${uuidv4()}.png`;
-    const filePath = path.resolve(__dirname, 'screenshots', fileName);
+    const filePath = path.join(screenshotsDir, fileName);
 
     await page.screenshot({ path: filePath, fullPage: true });
+    console.log('✅ Screenshot saved at:', filePath);
+
     await browser.close();
     return fileName;
   } catch (error) {
-    console.error('❌ Error during capture:', error);
+    console.error('❌ Error during capture:', error.message);
     await browser.close();
     throw new Error(`Capture failed: ${error.message}`);
   }

@@ -30,26 +30,34 @@ jobs:
 
       - name: Run server in background
         run: |
-          node server.js &
+          node server.js > server.log 2>&1 &
           sleep 5
 
-      - name: Test capture API
+      - name: Test capture - Naver
         run: |
-          curl "http://localhost:3000/capture?url=https://www.11st.co.kr" -o test_result.json || echo "API call failed"
-          cat test_result.json
+          echo "📸 Testing Naver..."
+          curl "http://localhost:3000/capture?url=https://www.naver.com" -o naver.json
+          cat naver.json
 
-      - name: Verify image created
+      - name: Test capture - Zara
+        run: |
+          echo "📸 Testing Zara..."
+          curl "http://localhost:3000/capture?url=https://www.zara.com/kr/" -o zara.json
+          cat zara.json
+
+      - name: Verify screenshots
         run: |
           count=$(ls screenshots/*.png 2>/dev/null | wc -l)
-          if [ "$count" -gt 0 ]; then
-            echo "✅ Screenshot captured successfully."
+          if [ "$count" -ge 2 ]; then
+            echo "✅ Captured at least two screenshots."
           else
-            echo "❌ Screenshot not found."
+            echo "❌ Expected 2 screenshots, found $count"
+            cat server.log || true
             exit 1
           fi
 
-      - name: Upload screenshot as artifact
+      - name: Upload screenshots as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: captured-screenshot
+          name: captured-screenshots
           path: screenshots/*.png

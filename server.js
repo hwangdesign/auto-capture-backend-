@@ -6,17 +6,17 @@ const { captureMobileScreenshot } = require('./capture');
 const app = express();
 const PORT = 3000;
 
-// 스크린샷 디렉토리 보장
+// 🗂 screenshots 디렉토리 보장
 const screenshotsDir = path.join(__dirname, 'screenshots');
 if (!fs.existsSync(screenshotsDir)) {
   fs.mkdirSync(screenshotsDir);
   console.log('📁 Created screenshots directory');
 }
 
-// 정적 이미지 제공 경로
+// 🖼 정적 이미지 서빙 경로 설정
 app.use('/screenshots', express.static(screenshotsDir));
 
-// 캡처 API
+// 📸 캡처 API 엔드포인트
 app.get('/capture', async (req, res) => {
   const { url } = req.query;
 
@@ -37,6 +37,7 @@ app.get('/capture', async (req, res) => {
   }
 });
 
+// 🚀 서버 시작
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

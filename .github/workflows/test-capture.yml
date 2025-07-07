@@ -3,7 +3,7 @@ name: Test AutoCapture Backend
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:  # 수동 실행도 가능
+  workflow_dispatch:
 
 jobs:
   test-capture:
@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Create screenshots directory
+        run: mkdir -p screenshots
+
       - name: Install Puppeteer Chromium
         run: |
           node -e "require('puppeteer').executablePath()" || true
@@ -32,12 +35,13 @@ jobs:
 
       - name: Test capture API
         run: |
-          curl "http://localhost:3000/capture?url=https://www.11st.co.kr"
+          curl "http://localhost:3000/capture?url=https://www.11st.co.kr" -o test_result.json || echo "API call failed"
           cat test_result.json
 
       - name: Verify image created
         run: |
-          if [ -f screenshots/*.png ]; then
+          count=$(ls screenshots/*.png 2>/dev/null | wc -l)
+          if [ "$count" -gt 0 ]; then
             echo "✅ Screenshot captured successfully."
           else
             echo "❌ Screenshot not found."

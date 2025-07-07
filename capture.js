@@ -14,7 +14,7 @@ async function captureMobileScreenshot(url) {
 
   const browser = await puppeteer.launch({
     headless: 'new',
-    args: ['--no-sandbox'], // GitHub Actions 환경에서 필수
+    args: ['--no-sandbox'], // GitHub Actions 등 CI 환경에서 필수
     defaultViewport: {
       width: 390,
       height: 844,
@@ -31,11 +31,15 @@ async function captureMobileScreenshot(url) {
 
   try {
     console.log('🕒 Navigating to page...');
-    await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+    await page.goto(url, {
+      waitUntil: 'networkidle2',
+      timeout: 60000 // 60초로 증가
+    });
+
+    await page.waitForTimeout(5000); // 추가 로딩 대기 (ZARA 등 애니메이션 대비)
 
     const fileName = `${uuidv4()}.png`;
     const filePath = path.join(screenshotsDir, fileName);
-
     await page.screenshot({ path: filePath, fullPage: true });
     console.log('✅ Screenshot saved at:', filePath);
 

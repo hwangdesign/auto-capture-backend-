@@ -10,53 +10,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📦 Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: 📥 Install dependencies
         run: npm install
 
-      - name: Create screenshots directory
+      - name: 🗂 Create screenshots directory
         run: mkdir -p screenshots
 
-      - name: Install Puppeteer Chromium
+      - name: 🧩 Install Puppeteer Chromium
         run: |
           node -e "require('puppeteer').executablePath()" || true
 
-      - name: Run server in background
+      - name: 🚀 Run server in background
         run: |
           node server.js > server.log 2>&1 &
-          sleep 5
+          sleep 10
 
-      - name: Test capture - Naver
+      - name: 🧪 Test capture - Naver
         run: |
-          echo "📸 Testing Naver..."
           curl "http://localhost:3000/capture?url=https://www.naver.com" -o naver.json
           cat naver.json
 
-      - name: Test capture - Zara
+      - name: 🧪 Test capture - Zara
         run: |
-          echo "📸 Testing Zara..."
           curl "http://localhost:3000/capture?url=https://www.zara.com/kr/" -o zara.json
           cat zara.json
 
-      - name: Verify screenshots
+      - name: ✅ Verify screenshots created
         run: |
           count=$(ls screenshots/*.png 2>/dev/null | wc -l)
           if [ "$count" -ge 2 ]; then
-            echo "✅ Captured at least two screenshots."
+            echo "✅ Captured $count screenshots."
           else
             echo "❌ Expected 2 screenshots, found $count"
             cat server.log || true
             exit 1
           fi
 
-      - name: Upload screenshots as artifact
+      - name: 📤 Upload screenshots as artifact
         uses: actions/upload-artifact@v4
         with:
           name: captured-screenshots

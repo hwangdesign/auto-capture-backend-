@@ -1,0 +1,2 @@
+mkdir -p screenshots
+touch screenshots/.gitkeep
